@@ -26,7 +26,7 @@ plugins:
   - search
   - mkdocs-jupyter:
       include_source: true
-      execute: false
+      execute: true
       include: ["src/*.py", "src/**/*.py"]
 
 markdown_extensions:
@@ -60,6 +60,10 @@ extra_javascript:
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML
   - https://unpkg.com/mermaid@10/dist/mermaid.min.js
   - js/mermaid_zoom.js
+  - js/code_toggle.js
+
+
+
 
 extra_css:
   - stylesheets/extra.css
