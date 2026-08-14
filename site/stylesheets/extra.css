@@ -1150,3 +1150,17 @@ body.mermaid-expanded-active {
   font-style: italic;
   font-weight: normal;
 }
+
+/* ==============================================================================
+   Responsive Plotly Figures in Jupyter Outputs
+   ============================================================================== */
+.jp-Notebook .jp-OutputArea-output,
+.jp-Notebook .plotly-graph-div,
+.jp-Notebook .js-plotly-plot {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.jp-Notebook .plotly-graph-div .main-svg {
+  border-radius: 6px;
+}
