@@ -1,0 +1,68 @@
+site_name: "A-Z Bias-Variance Tradeoff Tutorial Series"
+site_description: "Comprehensive tutorial series exploring the Bias-Variance Tradeoff for Advanced Machine Learning Engineers."
+site_author: "Advanced Machine Learning Engineer"
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Overview: index.md
+  - Tutorials:
+      - 01. Mathematical Error Decomposition: 01_irreducible_error_and_decomposition.md
+      - 02. Model Complexity & Polynomials: 02_model_complexity_and_polynomials.md
+      - 03. Learning Curves & Sample Complexity: 03_learning_curves_and_sample_complexity.md
+      - 04. Penalty-Based Regularization: 04_regularization.md
+      - 05. Cross-Validation Strategies: 05_cross_validation_strategies.md
+      - 06. Feature Selection & Dimensionality: 06_feature_selection_and_dimensionality.md
+      - 07. Ensembles (Bagging & Boosting): 07_ensembles_bagging_and_boosting.md
+      - 08. Temporally Complex Models: 08_advanced_topics_temporally_complex_models.md
