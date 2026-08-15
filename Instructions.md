@@ -1,4 +1,4 @@
-# **Project: A-Z Bias-Variance Tradeoff Tutorial Series (Advanced ML Engineer Edition)**
+# **Project: A-Z Bias-Variance Tradeoff Series (Advanced ML Engineer Edition)**
 
 ## **1\. Project Goal**
 
@@ -16,7 +16,6 @@ Create a comprehensive, "A-Z" end-to-end tutorial series exploring the Bias-Vari
   * Markdown text cell: `# %% [markdown]`  
 * **Visualizations:**  
   * Standard data plots must use `matplotlib` or `seaborn`.  
-  * Conceptual diagrams, flowcharts, and architectural models must be written in Markdown cells using nested mermaid code blocks. **Mermaid diagrams should only be used when absolutely necessary and crucial to explaining complex architectures or workflows.**
 
 ## **3\. Coding Standards & Constraints (STRICT)**
 

@@ -1,6 +1,6 @@
-# A-Z Bias-Variance Tradeoff Tutorial Series
+# A-Z Bias-Variance Tradeoff Series
 
-Welcome to the **A-Z Bias-Variance Tradeoff Tutorial Series**, designed specifically for **Advanced Machine Learning Engineers**.
+Welcome to the **A-Z Bias-Variance Tradeoff Series**, designed specifically for **Advanced Machine Learning Engineers**.
 
 This tutorial series explores the core statistical mechanics, empirical risk behavior, penalty trajectories, cross-validation variance, dimensional effects, ensemble decomposition, and temporal complexity involved in machine learning model evaluation and optimization.
 
@@ -8,28 +8,28 @@ This tutorial series explores the core statistical mechanics, empirical risk beh
 
 ## **Series Outline**
 
-1. **[01. Mathematical Error Decomposition](src/01_irreducible_error_and_decomposition.py)**  
+**[01. Mathematical Error Decomposition](src/01_irreducible_error_and_decomposition.py)**  
    Mathematical decomposition of expected prediction error into Bias, Variance, and Irreducible Noise. Practical estimation using bootstrapping and k-NN proxies.
 
-2. **[02. Model Complexity & Polynomials](src/02_model_complexity_and_polynomials.py)**  
+**[02. Model Complexity & Polynomials](src/02_model_complexity_and_polynomials.py)**  
    Visualizing the classic tradeoff via polynomial regression, condition numbers of design matrices, SVD analysis, and interpolation thresholds.
 
-3. **[03. Learning Curves & Sample Complexity](src/03_learning_curves_and_sample_complexity.py)**  
+**[03. Learning Curves & Sample Complexity](src/03_learning_curves_and_sample_complexity.py)**  
    Empirical Risk vs. True Risk, sample complexity bounds, VC-dimension context, and confidence interval bands across training set scaling.
 
-4. **[04. Penalty-Based Control (Regularization)](src/04_regularization.py)**  
+**[04. Penalty-Based Control (Regularization)](src/04_regularization.py)**  
    Ridge, Lasso, Elastic Net, Bayesian priors (Laplace vs Gaussian), LARS/Coordinate Descent paths, and exact shrinkage trajectories.
 
-5. **[05. Cross-Validation Strategies](src/05_cross_validation_strategies.py)**  
+**[05. Cross-Validation Strategies](src/05_cross_validation_strategies.py)**  
    Assessment variance, LOOCV, Nested CV, Nadeau & Bengio variance corrections, and Block Time-Series splitting.
 
-6. **[06. Feature Selection & Dimensionality](src/06_feature_selection_and_dimensionality.py)**  
+**[06. Feature Selection & Dimensionality](src/06_feature_selection_and_dimensionality.py)**  
    Curse of dimensionality, Filter/Wrapper methods, RFE, Stability selection via randomized Lasso, PCA vs. PLS variance mechanics.
 
-7. **[07. Aggregation & Ensembles](src/07_ensembles_bagging_and_boosting.py)**  
+**[07. Aggregation & Ensembles](src/07_ensembles_bagging_and_boosting.py)**  
    Variance reduction in Random Forests vs. Bias reduction in Gradient Boosting Machines (GBM) and Histogram-based boosting.
 
-8. **[08. Temporally Complex Models](src/08_advanced_topics_temporally_complex_models.py)**  
+**[08. Temporally Complex Models](src/08_advanced_topics_temporally_complex_models.py)**  
    Bias-variance tradeoff in time-series (VAR, ARIMA), stationarity impact, lag-length optimization, and expanding/rolling window CV.
 
 ---

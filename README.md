@@ -1,4 +1,4 @@
-# A-Z Bias-Variance Tradeoff Tutorial Series
+# A-Z Bias-Variance Tradeoff Series
 
 An advanced, hands-on tutorial series exploring the **Bias-Variance Tradeoff** from the perspective of an Advanced Machine Learning Engineer.
 

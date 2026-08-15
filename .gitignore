@@ -1,3 +1,7 @@
 .cache
 .venv
 .agents
+docs/src/__pycache__/
+docs/.cache/
+site/src/__pycache__/
+*__pycache__*

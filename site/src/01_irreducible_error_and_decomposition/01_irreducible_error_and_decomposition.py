@@ -48,24 +48,6 @@
 #    - **Cross-term 3**: $2 \mathbb{E}_{\mathcal{D}}[\bar{f}(x) - \hat{f}(x)] \mathbb{E}_{\epsilon}[\epsilon] = 0$ due to independence $\epsilon \perp \mathcal{D}$.
 #
 # Hence, the decomposition holds exactly.
-#
-# ### System Architecture & Bootstrap Decomposition Workflow
-#
-# The flowchart below conceptualizes how empirical bootstrap resampling approximates the analytical expectations $\mathbb{E}_{\mathcal{D}}[\cdot]$ and $\mathbb{E}_{\epsilon}[\cdot]$ across finite samples.
-#
-# ```mermaid
-# graph TD
-#     A["Ground Truth P(X, Y)"] -->|Sample N points| B["Observed Dataset D0"]
-#     B -->|Bootstrap Resampling B reps| C["Bootstrap Datasets D1 to DB"]
-#     C -->|Fit Estimator| D["Models f1(x) to fB(x)"]
-#     D -->|Evaluate on Test Set X_test| E["Prediction Matrix B x N_test"]
-#     E -->|Compute Mean over B| F["Pointwise Expectation E[f_hat(x)]"]
-#     F -->|"Compare with f(x)"| G["Pointwise Bias^2(x)"]
-#     E -->|Compute Variance over B| H["Pointwise Variance(x)"]
-#     G -->|Integrated Mean over X_test| I["Integrated Bias^2 and Variance"]
-#     H -->|Integrated Mean over X_test| I
-#     I -->|Add Irreducible Noise sigma^2| J["Expected Prediction Error Total MSE"]
-# ```
 
 # %% [markdown]
 # ### 1. Imports and Environment Setup

@@ -26,7 +26,7 @@
 # \hat{w} = (X^T X)^{-1} X^T y
 # $$
 #
-# ### 1. Variance Propagation & Design Matrix Conditioning
+# ### Variance Propagation & Design Matrix Conditioning
 #
 # Assuming additive homoskedastic noise $y = f(x) + \epsilon$ with $\text{Var}(\epsilon) = \sigma^2 I$, the covariance matrix of the parameter vector $\hat{w}$ over dataset sampling is:
 #
@@ -42,7 +42,15 @@
 # \text{Tr}\left(\text{Cov}(\hat{w})\right) = \sigma^2 \sum_{j=1}^{d+1} \frac{1}{\sigma_j^2}
 # $$
 #
-# The L2 condition number of the design matrix $X$ is defined as:
+# For any query point $x \in \mathbb{R}$ with feature expansion $\phi(x) \in \mathbb{R}^{d+1}$, the pointwise prediction is $\hat{f}(x) = \phi(x)^T \hat{w}$. Projecting parameter covariance onto the feature basis reveals the exact pointwise prediction variance:
+#
+# $$
+# \operatorname{Var}(\hat{f}(x)) = \phi(x)^T \operatorname{Cov}(\hat{w}) \phi(x) = \sigma^2 \phi(x)^T V \Sigma^{-2} V^T \phi(x) = \sigma^2 \left\| \Sigma^{-1} V^T \phi(x) \right\|_2^2 = \sigma^2 \sum_{j=1}^{d+1} \frac{(v_j^T \phi(x))^2}{\sigma_j^2}
+# $$
+#
+# where $v_j \in \mathbb{R}^{d+1}$ is the $j$-th right singular vector (the $j$-th column of $V$).
+#
+# The $L_2$ condition number of the design matrix $X$ is:
 #
 # $$
 # \kappa(X) = \frac{\sigma_{\max}(X)}{\sigma_{\min}(X)} = \frac{\sigma_1}{\sigma_{d+1}}
@@ -50,26 +58,7 @@
 #
 # Since $(X^T X)$ squares the singular values, its condition number explodes quadratically: $\kappa(X^T X) = \kappa(X)^2 = (\sigma_1 / \sigma_{d+1})^2$.
 #
-# As degree $d$ increases, higher powers $x^j$ and $x^{j+1}$ become near-linearly dependent over bounded intervals (e.g. $[0, 2]$), causing $\sigma_{\min}(X) \to 0$. As $\sigma_{\min}(X)$ approaches machine precision $\epsilon_{\text{mach}} \approx 10^{-16}$, $\kappa(X)$ explodes towards $\infty$, inflating parameter variance $\text{Var}(\hat{w}_j)$ and driving prediction variance $\|\text{Var}(\hat{f}(x))\| \to \infty$.
-#
-# ### System Architecture & SVD Conditioning Pipeline
-#
-# The flowchart below outlines how polynomial feature expansion induces design matrix ill-conditioning, weight norm explosion, and empirical error decomposition.
-#
-# ```mermaid
-# graph TD
-#     A["Training Sample D0 (N points)"] -->|Polynomial Feature Expansion| B["Vandermonde Design Matrix X (N x d+1)"]
-#     B -->|SVD Factorization U S V^T| C["Singular Value Spectrum sigma_i(X)"]
-#     C -->|Ratio sigma_max / sigma_min| D["Condition Number kappa(X)"]
-#     B -->|Bootstrap Resampling B reps| E["Bootstrap Datasets D_b*"]
-#     E -->|OLS Normal Equations| F["Parameter Vectors w_hat_b"]
-#     F -->|Compute Expected L2 Norm| G["Expected Weight Norm E[||w_hat||_2]"]
-#     F -->|Predict on X_test| H["Prediction Matrix B x N_test"]
-#     H -->|Empirical Decomposition| I["Bias^2, Variance, Total MSE"]
-#     D -->|Correlate with Variance| J["Ill-Conditioning & Error Explosion"]
-#     G -->|Correlate with Overfitting| J
-#     I --> J
-# ```
+# As polynomial degree $d$ increases, consecutive powers $x^j$ and $x^{j+1}$ become near-collinear over bounded intervals (e.g. $[0, 2]$), driving $\sigma_{\min}(X) = \sigma_{d+1} \to 0$. Any query feature $\phi(x)$ possessing non-zero projection $v_{d+1}^T \phi(x) \ne 0$ onto the trailing singular subspace undergoes amplification by $\sigma_{d+1}^{-2}$, causing catastrophic prediction variance inflation $\operatorname{Var}(\hat{f}(x)) \to \infty$.
 
 # %% [markdown]
 # ### 1. Imports and Environment Setup
@@ -114,8 +103,7 @@ SEED: int = 42
 np.random.seed(SEED)
 
 # %% [markdown]
-# #### Environment Initialization Output
-# Displays system status and global random seed configuration.
+# **Execution Output:** Environment initialization confirmation and global random seed configuration.
 
 # %%
 print(f"Environment initialized successfully. Random Seed = {SEED}")
@@ -164,8 +152,7 @@ x_test = np.linspace(0.0, 2.0, 300)
 y_test_true = true_function(x_test)
 
 # %% [markdown]
-# #### Synthetic Dataset Summary Output
-# Displays sample sizes and ground truth noise variance.
+# **Execution Output:** Synthetic training dataset sample sizes, evaluation grid dimensions, and ground truth noise variance.
 
 # %%
 print(f"Training dataset D0 size:       N = {len(x_train)}")
@@ -187,10 +174,12 @@ print(f"True Noise Variance (sigma^2):  {TRUE_NOISE_VARIANCE:.4f}")
 # - Pointwise Variance: $\text{Var}(\mathbf{P}_{:, i}, \text{ddof}=0)$
 # - Empirical Total MSE: Evaluated against independent noisy test realizations $y_{\text{test}, b} = f(x_{\text{test}}) + \epsilon_b$.
 #
-# In addition, we analyze the SVD of the uncentered full training design matrix $X = \phi(x_{\text{train}}) \in \mathbb{R}^{N \times (d+1)}$:
+# In addition, we analyze the SVD of the full training design matrix $X = \phi(x_{\text{train}}) \in \mathbb{R}^{N \times (d+1)}$:
 # - Singular values $\sigma_1 \ge \sigma_2 \ge \dots \ge \sigma_{d+1}$
 # - Design matrix condition number $\kappa(X) = \sigma_1 / \sigma_{d+1}$
 # - Expected OLS coefficient vector norm $\mathbb{E}[\|\hat{w}\|_2] = \frac{1}{B} \sum_{b=1}^B \|\hat{w}_b\|_2$ (evaluated per bootstrap trial to capture coefficient variance explosion without sign cancellation).
+#
+# *Note on Uncentered vs. Centered Conditioning:* The condition number $\kappa(X)$ is computed on the uncentered monomial Vandermonde system with the intercept column ($x^0 = 1$) included over the positive domain $x \in [0, 2]$. Because uncentered positive powers $x^j$ and $x^{j+1}$ are strongly cross-correlated with non-zero means, retaining the uncentered bias column shifts the singular value spectrum downward and accelerates the collapse of $\sigma_{\min}(X)$ compared to mean-centered features or orthogonal polynomials (e.g. Chebyshev polynomials).
 
 # %%
 def decompose_polynomial_bias_variance(
@@ -284,8 +273,7 @@ sample_res = decompose_polynomial_bias_variance(
 )
 
 # %% [markdown]
-# #### Baseline Polynomial Decomposition Output
-# Displays error components, condition number, and identity residual for degree 3 polynomial regression.
+# **Execution Output:** Baseline polynomial decomposition metrics, condition number, and identity residual for degree $d=3$.
 
 # %%
 print("Baseline Polynomial Decomposition (Degree d=3):")
@@ -301,12 +289,12 @@ print(f"  Expected Weight Norm E[||w||_2]: {sample_res['coef_l2_norm']:.4f}")
 # %% [markdown]
 # ### 4. Polynomial Degree Sweeps ($d = 1 \dots 15$)
 #
-# We sweep polynomial degree $d$ from $1$ (linear) up to $15$ (high-degree ill-conditioned expansion).
+# With the SVD diagnostic engine verified on a baseline cubic model ($d=3$), we extend the analysis across $d \in [1, 15]$ to map the phase transition from underfitting to severe ill-conditioning.
 #
 # Across degrees:
 # - **Underfitting ($d=1, 2$)**: High Bias$^2$, low Variance, low condition number $\kappa(X) \sim 10^1$.
 # - **Optimal ($d=3, 4, 5$)**: Minimum total risk, balanced Bias$^2$ and Variance, moderate condition number $\kappa(X) \sim 10^2 - 10^4$.
-# - **Overfitting & Ill-Conditioning ($d \ge 8$)**: Bias$^2$ stabilizes, Variance explodes exponentially as $\kappa(X)$ exceeds $10^8$, leading to numerical noise amplification and coefficient norm explosion $\mathbb{E}[\|\hat{w}\|_2] \gg 10^4$.
+# - **Overfitting & Ill-Conditioning ($d \ge 8$)**: While $\text{Bias}^2$ monotonically decreases in infinite-precision theory, in finite precision $\text{Bias}^2$ plateaus before exhibiting an apparent empirical rise at extreme degrees ($d \ge 10$) due to floating-point rank truncation. Prediction variance explodes ($\approx 26.93$ at $d=14$) as $\kappa(X)$ exceeds $10^{11}$. Standard LAPACK SVD solvers (`*gelsd`) truncate trailing singular modes below $\text{rcond} \approx \epsilon_{\text{mach}}$, clamping the empirical norm $\mathbb{E}[\|\hat{w}\|_2]$ while destabilizing out-of-sample predictions.
 
 # %%
 degrees_range = np.arange(1, 16)
@@ -338,8 +326,7 @@ poly_records = [
 df_poly = pd.DataFrame(poly_records)
 
 # %% [markdown]
-# #### Complexity Sweep Data Table Output
-# Displays top 5 rows of polynomial complexity metrics DataFrame.
+# **Execution Output:** Polynomial complexity sweep results across degrees $d=1$ to $5$.
 
 # %%
 display(df_poly.head(5))
@@ -455,7 +442,7 @@ fig1.update_layout(
     legend=dict(
         orientation="h",
         yanchor="bottom",
-        y=1.02,
+        y=1.1,
         xanchor="center",
         x=0.5,
         bgcolor="rgba(255,255,255,0.9)",
@@ -543,7 +530,7 @@ fig2.update_layout(
     template="plotly_white",
     hovermode="x unified",
     margin=dict(l=60, r=60, t=80, b=60),
-    legend=dict(x=0.02, y=0.98, bgcolor="rgba(255,255,255,0.85)", bordercolor="#cccccc", borderwidth=1),
+    legend=dict(x=0.02, y=1.1, bgcolor="rgba(255,255,255,0.85)", bordercolor="#cccccc", borderwidth=1),
     height=520
 )
 
@@ -607,9 +594,9 @@ fig3.update_layout(
     legend=dict(
         orientation="h",
         yanchor="bottom",
-        y=1.02,
+        y=1.1,
         xanchor="center",
-        x=0.25,
+        x=0.5,
         bgcolor="rgba(255,255,255,0.9)",
         bordercolor="#e0e0e0",
         borderwidth=1
@@ -628,17 +615,16 @@ fig3.show()
 # %% [markdown]
 # ### 6. Summary & Key Engineering Takeaways
 #
-# Below is the consolidated summary table comparing error components, condition numbers, and expected coefficient norms across representative polynomial degrees.
+# Below is the consolidated summary table comparing error components, condition numbers, and expected coefficient norms across representative degrees.
 #
 # #### Key Engineering Takeaways:
-# 1. **Ill-Conditioning & Variance Explosion**: As degree $d$ increases past $5$, the design matrix condition number $\kappa(X)$ exceeds $10^5$. Near-collinearity of polynomial features $x^j$ inflates OLS parameter variance $\text{Var}(\hat{w}) = \sigma^2 (X^T X)^{-1}$, driving generalization variance upward.
+# 1. **Ill-Conditioning & Variance Propagation**: As degree $d$ increases past $5$, the design matrix condition number $\kappa(X)$ exceeds $10^5$. Near-collinearity of monomial features $x^j$ inflates parameter covariance $\operatorname{Cov}(\hat{w}) = \sigma^2 (X^T X)^{-1}$, which projects onto query features $\phi(x)$ to cause explosive pointwise variance $\operatorname{Var}(\hat{f}(x)) = \sigma^2 \|\Sigma^{-1} V^T \phi(x)\|_2^2$.
 # 2. **SVD Spectral Decay & Coefficient Norm Dynamics**: Trailing singular values collapse exponentially. In unconstrained OLS, parameter variance scales with $\sum \sigma_k^{-2}$, driving exponential growth in coefficient norms up to moderate degrees ($d \le 9$). Beyond this point, numerical rank-truncation in standard SVD solvers suppresses under-determined modes, capping the norm while severely destabilizing point predictions.
 # 3. **Numerical Regularization Requirement**: High-degree unregularized polynomials overfit localized noise. Mitigating ill-conditioning requires L2 penalty regularization (Ridge regression $\lambda I$) or SVD rank truncation (pseudo-inverse thresholding).
-# 4. **Finite-Precision Solver Truncation vs. Approximability**: Expanding nested hypothesis classes ($\mathcal{H}_1 \subset \mathcal{H}_2 \subset \dots \subset \mathcal{H}_{15}$) guarantees non-increasing approximation bias in theory. In practice, at $d \ge 10$, the condition number $\kappa(X) \sim 10^{11}$ pushes trailing singular values below the LAPACK `*gelsd` truncation threshold ($\text{rcond} \approx \epsilon_{\text{mach}}$). The solver discards these near-null singular modes, implicitly restricting the parameter space and producing an artificial surge in empirical $\text{Bias}^2$ due to algorithmic rank truncation rather than representational incapacity.
-
+# 4. **Finite-Precision Solver Truncation vs. Polynomial Functional Expressiveness**: Theoretically, nested polynomial hypothesis spaces ($\mathcal{H}_1 \subset \mathcal{H}_2 \subset \dots \subset \mathcal{H}_{15}$) guarantee that approximation error $\text{Bias}^2(\mathcal{H}_d)$ is monotonically non-increasing in $d$ (by the Weierstrass Approximation Theorem). However, the empirical rise in $\text{Bias}^2$ at $d \ge 10$ is strictly a numerical artifact of the **standard monomial basis** representation ($1, x, x^2, \dots$) in floating-point arithmetic. When $\kappa(X) \sim 10^{11}-10^{14}$, trailing singular values fall below the LAPACK `*gelsd` threshold ($\text{rcond} \approx \epsilon_{\text{mach}}$). The solver discards these near-null singular directions, projecting the estimator onto a lower-dimensional subspace and artificially restricting model capacity. This is an algorithmic and floating-point limitation of the uncentered monomial coordinate system, not an intrinsic representational failure of high-degree polynomial function spaces (which remain well-conditioned when expressed via orthogonal Chebyshev or Legendre bases).
+#
 # %% [markdown]
-# #### Final Summary Table Display
-# Renders final empirical summary table and maximum identity residual across selected configurations in a single isolated block.
+# **Execution Output:** Final empirical polynomial error decomposition and conditioning summary across representative degrees.
 
 # %%
 summary_degrees = [1, 3, 5, 9, 14]

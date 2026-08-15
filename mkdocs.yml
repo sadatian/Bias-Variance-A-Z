@@ -1,4 +1,4 @@
-site_name: "A-Z Bias-Variance Tradeoff Tutorial Series"
+site_name: "Bias-Variance A-Z"
 site_url: https://sadatian.io/Bias-Variance-A-Z/
 site_author: Dan Sadatian
 site_dir: site
@@ -40,11 +40,7 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tasklist:
@@ -58,8 +54,7 @@ markdown_extensions:
 
 extra_javascript:
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML
-  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
-  - js/mermaid_zoom.js
+  - https://cdn.plot.ly/plotly-3.7.0.min.js
   - js/code_toggle.js
 
 
@@ -70,7 +65,7 @@ extra_css:
 
 nav:
   - Home: index.md
-  - Tutorials:
+  - Modules:
       - "01. Mathematical Error Decomposition": src/01_irreducible_error_and_decomposition.py
       - "02. Model Complexity & Polynomials": src/02_model_complexity_and_polynomials.py
       - "03. Learning Curves & Sample Complexity": src/03_learning_curves_and_sample_complexity.py
