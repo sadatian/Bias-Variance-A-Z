@@ -489,7 +489,7 @@ fig2.update_layout(
     template="plotly_white",
     height=540,
     margin=dict(l=60, r=40, t=125, b=70),
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
+    legend=dict(orientation="h", yanchor="top", y=1.25, xanchor="center", x=0.5)
 )
 fig2.show()
 
@@ -564,7 +564,7 @@ fig3.update_layout(
     template="plotly_white",
     height=480,
     margin=dict(l=60, r=60, t=95, b=60),
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
+    legend=dict(orientation="h", yanchor="top", y=1.2, xanchor="center", x=0.5)
 )
 fig3.show()
 

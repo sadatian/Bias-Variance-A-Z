@@ -205,7 +205,7 @@ print(f"  Module:                   03_learning_curves_and_sample_complexity")
 print(f"  Random Seed:              {SEED}")
 print(f"  Domain Interval:          [{DOMAIN_A}, {DOMAIN_B}]")
 print(f"  Irreducible Noise Std:    {NOISE_STD:.4f}")
-print(f"  Bayes Noise Floor (σ²):   {TRUE_NOISE_VARIANCE:.4f}")
+print(f"  Bayes Noise Floor (𝜎²):   {TRUE_NOISE_VARIANCE:.4f}")
 print(f"  Dense Grid Points:        {len(x_val_grid)}")
 print(f"  Status:                   READY_FOR_SIMULATION")
 
@@ -530,7 +530,7 @@ for col_idx, (name, deg) in enumerate(regime_models, start=1):
         go.Scatter(
             x=[n_pts[0], n_pts[-1]], y=[asymptote_val, asymptote_val],
             mode="lines",
-            name="Asymptotic Floor (Bias² + σ²)",
+            name="Asymptotic Floor (Bias² + 𝜎²)",
             line=dict(color="#1b9e77", width=1.8, dash="dot"),
             showlegend=(col_idx == 1),
             hovertemplate=f"Asymptote: {asymptote_val:.4f}<extra></extra>"
@@ -543,7 +543,7 @@ for col_idx, (name, deg) in enumerate(regime_models, start=1):
         go.Scatter(
             x=[n_pts[0], n_pts[-1]], y=[TRUE_NOISE_VARIANCE, TRUE_NOISE_VARIANCE],
             mode="lines",
-            name="Bayes Noise (σ²=0.09)",
+            name="Bayes Noise (𝜎²=0.09)",
             line=dict(color="#666666", width=1.5, dash="dashdot"),
             showlegend=(col_idx == 1),
             hovertemplate=f"Bayes Floor: {TRUE_NOISE_VARIANCE:.4f}<extra></extra>"
@@ -816,7 +816,7 @@ fig3.add_trace(
     go.Scatter(
         x=[n_pts[0], n_pts[-1]], y=[TRUE_NOISE_VARIANCE, TRUE_NOISE_VARIANCE],
         mode="lines",
-        name="Irreducible Noise Floor (σ²=0.09)",
+        name="Irreducible Noise Floor (𝜎²=0.09)",
         line=dict(color="#666666", width=2, dash="dot"),
         hovertemplate="Noise Floor: 0.0900<extra></extra>"
     )
@@ -827,7 +827,7 @@ fig3.add_trace(
     go.Scatter(
         x=n_pts, y=res_overfit["decomposed_sum"],
         mode="lines+markers",
-        name="Total Decomposed Risk (Bias² + Var + σ²)",
+        name="Total Decomposed Risk (Bias² + Var + 𝜎²)",
         line=dict(color="#1b9e77", width=3.5),
         marker=dict(symbol="circle", size=9),
         hovertemplate="Total Risk: %{y:.4f}<extra></extra>"
@@ -936,4 +936,4 @@ styled_milestones = (
 
 display(Markdown("### Final Learning Curve & Sample Complexity Milestone Summary"))
 display(styled_milestones)
-display(Markdown(f"**Bayes Irreducible Noise Floor (σ²):** `{TRUE_NOISE_VARIANCE:.4f}`"))
+display(Markdown(f"**Bayes Irreducible Noise Floor (𝜎²):** `{TRUE_NOISE_VARIANCE:.4f}`"))
